@@ -1,0 +1,103 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Player : MonoBehaviour
+{
+    
+    private Rigidbody2D rb;
+    private Animator anim; 
+
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float moveSpeed;
+
+    private int facingDir = 1;
+    private bool facingRight = true;
+
+    private float xInput;
+
+    private bool isGrounded;
+    [SerializeField] private float groundCheckDistance;
+    [SerializeField] private LayerMask whatIsGround;
+
+
+    // 初始更新
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        anim = GetComponentInChildren<Animator>();
+    }
+
+   
+
+    // 实时更新
+    void Update()
+    {
+        movement();
+        CheckInput();
+        AnimatorControllers();
+        FlipController();
+        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
+        Debug.Log(isGrounded);
+
+
+
+    }
+
+    private void CheckInput()
+    {
+        xInput = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump(rb);
+        }
+    }
+
+    private void movement()
+    {
+        rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
+    }
+
+    private void Jump(Rigidbody2D rb)
+    {
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    }
+
+    private void AnimatorControllers()
+    {
+        bool isMoving = rb.velocity.x != 0;
+
+        anim.SetBool("isMoving", isMoving);
+
+    }
+
+    private void Flip()
+    {
+        facingDir = facingDir * -1;
+        facingRight = !facingRight;
+        transform.Rotate(0, 180, 0);
+    }
+
+    private void FlipController()
+    {
+        if (rb.velocity.x > 0 && !facingRight)
+        {
+            Flip();
+        }
+        else if (rb.velocity.x < 0 && facingRight)
+        {
+            Flip();
+        }
+        
+
+
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawLine(transform.position,new Vector3(transform.position.x, transform.position.y - groundCheckDistance));
+        
+    }
+
+}
