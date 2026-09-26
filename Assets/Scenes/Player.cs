@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     [Header("Dash info")]
     [SerializeField] private float dashDuration;
     [SerializeField] private float dashTime;
+    [SerializeField] private float dashCooldown = 2;
+    private float dashCooldownRemaining;
 
     private int facingDir = 1;
     private bool facingRight = true;
@@ -46,10 +48,13 @@ public class Player : MonoBehaviour
         CollisionChecks();
 
         dashTime -= Time.deltaTime;
+        dashCooldownRemaining -= Time.deltaTime;
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        // 冲刺冷却：CD 转好后才能再次触发
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dashCooldownRemaining <= 0)
         {
             dashTime = dashDuration;
+            dashCooldownRemaining = dashCooldown;
         }
 
         
