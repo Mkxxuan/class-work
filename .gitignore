@@ -9,6 +9,8 @@
 
 # IDE 生成文件
 .idea/
+.vscode/
+.workbuddy/
 *.csproj
 *.sln
 *.user
