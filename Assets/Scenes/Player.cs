@@ -1,19 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    
+
     private Rigidbody2D rb;
-    private Animator anim; 
+    private Animator anim;
 
     [SerializeField] private float jumpForce;
     [SerializeField] private float moveSpeed;
 
     [Header("Dash info")]
     [SerializeField] private float dashDuration;
-    [SerializeField] private float dashTime;
+    private float dashTime;
+
+    [SerializeField] private float dashCooldown;
+    private float dashCooldownTimer;
 
     private int facingDir = 1;
     private bool facingRight = true;
@@ -34,7 +35,7 @@ public class Player : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
     }
 
-   
+
 
     // 实时更新
     void Update()
@@ -46,13 +47,11 @@ public class Player : MonoBehaviour
         CollisionChecks();
 
         dashTime -= Time.deltaTime;
+        dashCooldownTimer -= Time.deltaTime;
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            dashTime = dashDuration;
-        }
 
-        
+
+
 
 
     }
@@ -70,26 +69,41 @@ public class Player : MonoBehaviour
         {
             Jump(rb);
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            DashAbility();
+        }
+    }
+
+    private void DashAbility()
+    {
+        if (dashCooldownTimer < 0)
+        {
+            dashCooldownTimer = dashCooldown;
+            dashTime = dashDuration;
+        }
+
     }
 
     private void movement()
     {
         if (dashTime > 0)
         {
-            rb.velocity = new Vector2(xInput * dashSpeed * 2,0);
+            rb.velocity = new Vector2(xInput * dashSpeed * 2, 0);
         }
         else
         {
             rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
         }
-            
+
     }
 
     private void Jump(Rigidbody2D rb)
     {
-        if(isGrounded)
+        if (isGrounded)
         {
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
     }
 
@@ -122,15 +136,15 @@ public class Player : MonoBehaviour
         {
             Flip();
         }
-        
+
 
 
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawLine(transform.position,new Vector3(transform.position.x, transform.position.y - groundCheckDistance));
-        
+        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - groundCheckDistance));
+
     }
 
 }
