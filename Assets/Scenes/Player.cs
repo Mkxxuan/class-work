@@ -16,6 +16,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float dashCooldown;
     private float dashCooldownTimer;
 
+    [Header("Attack info")]
+    private bool isAttacking;
+    private int attackCounter;
+
     private int facingDir = 1;
     private bool facingRight = true;
 
@@ -49,11 +53,11 @@ public class Player : MonoBehaviour
         dashTime -= Time.deltaTime;
         dashCooldownTimer -= Time.deltaTime;
 
+    }
 
-
-
-
-
+    public void AttackOver()
+    {
+        isAttacking = false;
     }
 
     private void CollisionChecks()
@@ -64,6 +68,16 @@ public class Player : MonoBehaviour
     private void CheckInput()
     {
         xInput = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            isAttacking = true;
+            attackCounter++;
+        }
+        else
+        {
+            isAttacking = false;
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -116,6 +130,8 @@ public class Player : MonoBehaviour
         anim.SetBool("isMoving", isMoving);
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isDashing", dashTime > 0);
+        anim.SetBool("isAttacking", isAttacking);
+        anim.SetInteger("attackCounter", attackCounter);
 
     }
 
